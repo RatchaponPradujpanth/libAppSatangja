@@ -1,50 +1,101 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import LoginScreen from "./src/screens/LoginScreen";
-import RegisterScreen from "./src/screens/RegisterScreen";
-import LibraryScreen from "./src/screens/LibraryScreen";
-import ProfileScreen from "./src/screens/ProfileScreen";
-import NotificationScreen from "./src/screens/NotificationScreen";
-import QueueReservation from "./src/screens/QueueReservation";
-import ItemloanScreen from "./src/screens/ItemloanScreen";
-import BookingScreen from "./src/screens/BookingScreen";
-import BorrowEquipmentScreen from "./src/screens/BorrowEquipmentScreen";
-import CurrentlyBorrowingContent from "./src/screens/CurrentlyBorrowingContent";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import RegisterScreen from "./src/Screen/RegisterScreen";
+import LoginScreen from "./src/Screen/LoginScreen";
+import LibraryScreen from "./src/Screen/LibraryScreen";
+import BookingScreen from "./src/Screen/BookingScreen";
+import ItemloanScreen from "./src/Screen/ItemloanScreen";
+import ProfileScreen from "./src/Screen/ProfileScreen";
+import NotificationScreen from "./src/Screen/NotificationScreen";
+import LoanStatusScreen from "./src/Screen/LoanStatusScreen";
+import { Ionicons } from "@expo/vector-icons";
+
 
 const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Tab.Navigator initialRouteName="Login">
-        <Tab.Screen name="Login" component={LoginScreen} />
-        <Tab.Screen name="Register" component={RegisterScreen} />
-        <Tab.Screen name="Library" component={LibraryScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-        <Tab.Screen name="Notification" component={NotificationScreen} />
-        <Tab.Screen name="QueueReservation" component={QueueReservation} />
-        <Tab.Screen name="ItemloanScreen" component={ItemloanScreen} />
-        <Tab.Screen name="BookingScreen" component={BookingScreen} />
-        <Tab.Screen
-          name="BorrowEquipmentScreen"
-          component={BorrowEquipmentScreen}
+      <Stack.Navigator>
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="Regis" component={RegisterScreen} options={{ headerShown: false }}/>
+        <Stack.Screen
+          name="Main"
+          component={MainTabNavigator}
+          options={{ headerShown: false }}
         />
-        <Tab.Screen
-          name="CurrentlyBorrowing"
-          component={CurrentlyBorrowingContent}
-        />
-      </Tab.Navigator>
+        <Stack.Screen name="Notification" component={NotificationScreen} 
+          options={{ 
+          headerStyle: { 
+            height: 40
+          } 
+        }}/>
+        <Stack.Screen name="Profile" component={ProfileScreen} 
+          options={{ 
+          headerStyle: { 
+            height: 40
+          } 
+        }}/>
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
+function MainTabNavigator() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+
+          if (route.name === "Library") {
+            iconName = focused ? "library" : "library-outline";
+          } else if (route.name === "Rooms") {
+            iconName = focused ? "calendar" : "calendar-outline";
+          } else if (route.name === "Items") {
+            iconName = focused ? "albums" : "albums-outline";
+          } else if (route.name === "Loans") {
+            iconName = focused ? "book" : "book-outline";
+          } else if (route.name === "Profile") {
+            iconName = focused ? "person-circle" : "person-circle-outline";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "#B68D40",
+        tabBarInactiveTintColor: "gray",
+      })}
+    >
+      <Tab.Screen 
+        name="Library"
+        component={LibraryScreen} 
+        options={{ 
+          headerStyle: { 
+            height: 40
+          } 
+        }} 
+      />
+      <Tab.Screen name="Rooms" component={BookingScreen}   
+        options={{ 
+          headerStyle: { 
+            height: 40
+          } 
+        }} />
+      <Tab.Screen name="Items" component={ItemloanScreen}   
+        options={{ 
+          headerStyle: { 
+            height: 40
+          } 
+        }} />
+      <Tab.Screen name="Loans" component={LoanStatusScreen}    
+        options={{ 
+          headerStyle: { 
+            height: 40
+          } 
+        }} />
+    </Tab.Navigator>
+  );
+}

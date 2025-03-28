@@ -1,14 +1,14 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation
 
-const LibraryScreen = ({navigation}) => {
+const LibraryScreen = ({ route }) => {
+  const navigation = useNavigation(); // Get navigation using useNavigation hook
+
+  // Check if route.params and name are defined
+  const name = route?.params?.name || "ผู้ใช้"; // Use a fallback name if not passed
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -34,7 +34,8 @@ const LibraryScreen = ({navigation}) => {
       </View>
 
       <View style={styles.greeting}>
-        <Text style={styles.greetingText}>สวัสดี, John Doe 👋</Text>
+        {/* Display name */}
+        <Text style={styles.greetingText}>สวัสดี, {name} 👋</Text>
         <Text style={styles.greetingSubText}>
           คุณมีการจองห้องที่กำลังจะถึง 0 รายการ
         </Text>
@@ -45,7 +46,7 @@ const LibraryScreen = ({navigation}) => {
           <Ionicons name="home-outline" size={30} color="#122620" />
           <Text style={styles.buttonText}>จองห้อง</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Borrow")}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Items")}>
           <Ionicons name="briefcase-outline" size={30} color="#122620" />
           <Text style={styles.buttonText}>ยืมอุปกรณ์</Text>
         </TouchableOpacity>
@@ -80,7 +81,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     height: "100%",
   },
-
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -126,8 +126,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
-    flex: 1, // เพิ่ม flex เพื่อให้ปุ่มทั้งสองเท่ากัน
-    marginHorizontal: 5, // เพิ่มระยะห่างระหว่างปุ่ม
+    flex: 1,
+    marginHorizontal: 5,
   },
   buttonText: {
     marginTop: 5,

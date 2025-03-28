@@ -5,11 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { registerUser } from "../services/api";
+import { RegisterUser, Rooms } from "../ServiceAPI/API"; // Import the updated RegisterUser function
+import AlertModal from "../Component/AlertModal"; // Import the AlertModal component
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -18,27 +18,56 @@ const RegisterScreen = () => {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState(""); // 'success' or 'error'
 
   const handleRegister = async () => {
+    if (!name || !username || !phone || !password || !confirmPassword) {
+      setModalMessage("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+      setModalType("error");
+      setModalVisible(true);
+      return;
+    }
     if (password !== confirmPassword) {
-      Alert.alert("แจ้งเตือน", "รหัสผ่านไม่ตรงกัน");
+      setModalMessage("รหัสผ่านไม่ตรงกัน");
+      setModalType("error");
+      setModalVisible(true);
       return;
     }
 
+    setLoading(true); // Start loading
+
     try {
-      const response = await registerUser(name, username, phone, password);
-      if (response) {
-        Alert.alert("สำเร็จ", "ลงทะเบียนเรียบร้อย");
-        navigation.navigate("Login");
-      }
+      // Call the updated RegisterUser function
+      const registerData = await RegisterUser(name, username, phone, password);
+      console.log("User registered:", registerData);
+
+      // Show success message and navigate to the Login screen
+      setModalMessage("ลงทะเบียนเรียบร้อย");
+      setModalType("success");
+      setModalVisible(true);
+
+      // Navigate to the Login screen
+      navigation.navigate("Login");
+
+      // Fetch rooms data after successful registration
+      const roomData = await Rooms();
+      console.log("Rooms fetched after registration:", roomData);
     } catch (error) {
-      Alert.alert("แจ้งเตือน", error.message);
+      setLoading(false); // Stop loading on error
+      setModalMessage(error.message || "ไม่สามารถลงทะเบียนได้");
+      setModalType("error");
+      setModalVisible(true);
     }
+
+    setLoading(false); // Stop loading
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ลงทะเบียน</Text>
+      <Text style={styles.title}>Register</Text>
       <TextInput
         style={styles.input}
         placeholder="ชื่อ-นามสกุล"
@@ -72,13 +101,30 @@ const RegisterScreen = () => {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
       />
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Ionicons name="person-add" size={20} color="#fff" />
-        <Text style={styles.buttonText}>ลงทะเบียน</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleRegister}
+        disabled={loading} // Disable button while loading
+      >
+        {loading ? (
+          <Text style={styles.buttonText}>กำลังลงทะเบียน...</Text> // Show loading text
+        ) : (
+          <>
+            <Ionicons name="person-add" size={20} color="#fff" />
+            <Text style={styles.buttonText}>Register</Text>
+          </>
+        )}
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Login")}>
         <Text style={styles.link}>มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</Text>
       </TouchableOpacity>
+
+      <AlertModal
+        isVisible={modalVisible}
+        message={modalMessage}
+        type={modalType}
+        onClose={() => setModalVisible(false)}
+      />
     </View>
   );
 };
@@ -110,7 +156,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#007AFF",
+    backgroundColor: "#122620",
     padding: 14,
     borderRadius: 10,
     marginTop: 10,
@@ -127,7 +173,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   link: {
-    color: "#007AFF",
+    color: "#122620",
     fontSize: 16,
     textAlign: "center",
     marginTop: 15,
