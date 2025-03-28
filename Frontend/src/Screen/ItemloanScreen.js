@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BorrowEquipmentCard from "../Component/BorrowEquipmentCard";
-import { Items, BorrowItem } from "../ServiceAPI/API";
+import { Items,  } from "../ServiceAPI/API";
 
 const ItemloanScreen = ({ navigation, token }) => {
   const [searchText, setSearchText] = useState("");
@@ -45,7 +45,7 @@ const ItemloanScreen = ({ navigation, token }) => {
     } else {
       try {
         // เรียก API สำหรับการยืม
-        await BorrowItem(token, item.id);
+       
         
         // อัพเดท UI
         setBorrowedItems(prev => new Set([...prev, item.id]));

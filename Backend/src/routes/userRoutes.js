@@ -50,7 +50,14 @@ export const loginUser = async (req, res) => {
 
 export const getUser = async (req, res) => {
   try {
-  } catch (error) {}
+    const sql = "SELECT id, name, username, phone FROM Users";
+    const users = await allQuery(sql, []);
+    res.json(users);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error getting users", error: error.message });
+  }
 };
 
 export const addItem = async (req, res) => {
@@ -415,7 +422,6 @@ export const updateSettings = async (req, res) => {
       .status(500)
       .json({ message: "Error updating settings", error: error.message });
   }
-  
 };
 
 export const loanItems = async (req, res) => {
